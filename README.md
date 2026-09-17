@@ -14,7 +14,7 @@ Tested with:
 * Windows 11 24H2 (26100-series)
 
 The game previously crashed shortly after launch with `0xc0000005` at
-`forza\\\_x64\\\_release\\\_final.exe + 0x1f28dec`. With FH3ArcFix installed, the game launches and
+`forza\\\\\\\_x64\\\\\\\_release\\\\\\\_final.exe + 0x1f28dec`. With FH3ArcFix installed, the game launches and
 normal gameplay works on the tested machine.
 
 > \\\*\\\*Known issue:\\\*\\\* FH3 may still show \\\*\\\*FH204 — Unsupported graphics card detected\\\*\\\*.
@@ -39,7 +39,7 @@ See [docs/TECHNICAL.md](docs/TECHNICAL.md) for the debugging details.
 3. Run:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\\\\install.ps1
+powershell -ExecutionPolicy Bypass -File .\\install.ps1
 ```
 
 The installer finds the registered `Microsoft.OpusPG` package and places `d3d12.dll` in FH3's
@@ -51,7 +51,7 @@ or registry changes.
 ## Uninstall
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\\\\uninstall.ps1
+powershell -ExecutionPolicy Bypass -File .\\uninstall.ps1
 ```
 
 ## Build from source
@@ -73,7 +73,7 @@ build.cmd
 Output:
 
 ```text
-build\\\\d3d12.dll
+build\\d3d12.dll
 ```
 
 For diagnostic `OutputDebugString` messages usable with DebugView:
@@ -111,6 +111,4 @@ Playground Games, Turn 10 Studios, Intel, or OpenAI.
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
-
 
