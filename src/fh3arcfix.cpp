@@ -4,17 +4,18 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 
+#include <array>
+#include <atomic>
 #include <cwchar>
 #include <iterator>
 #include <mutex>
 #include <string>
-#include <unordered_map>
 
 namespace {
 
 HMODULE g_realD3D12 = nullptr;
 std::once_flag g_realLoadOnce;
-std::mutex g_hookMutex;
+std::mutex g_patchMutex;
 
 using PFN_REAL_D3D12_CREATE_DEVICE = HRESULT (WINAPI *)(IUnknown*, D3D_FEATURE_LEVEL, REFIID, void**);
 using PFN_REAL_D3D12_SERIALIZE_ROOT_SIGNATURE = HRESULT (WINAPI *)(
@@ -25,13 +26,32 @@ using PFN_CREATE_DEPTH_STENCIL_VIEW = void (STDMETHODCALLTYPE *)(
 PFN_REAL_D3D12_CREATE_DEVICE g_realCreateDevice = nullptr;
 PFN_REAL_D3D12_SERIALIZE_ROOT_SIGNATURE g_realSerializeRootSignature = nullptr;
 
-// IUnknown (3) + ID3D12Object (4) + ID3D12Device methods.
+// ID3D12Device::CreateDepthStencilView is vtable slot 21:
+//   0-2   IUnknown
+//   3-6   ID3D12Object
+//   7-20  preceding ID3D12Device methods
+//   21    CreateDepthStencilView
+//
+// Newer ID3D12DeviceN interfaces extend the base interface by appending methods;
+// they do not reorder the ID3D12Device ABI. We also explicitly QueryInterface
+// for ID3D12Device before patching.
 constexpr size_t VT_CREATE_DEPTH_STENCIL_VIEW = 21;
+constexpr size_t MAX_HOOK_RECORDS = 16;
 
-// Keep the original function for each runtime vtable we patch. We modify only
-// one slot in-place; the remainder of Microsoft's ID3D12Device/DeviceN vtable
-// stays untouched.
-std::unordered_map<void**, PFN_CREATE_DEPTH_STENCIL_VIEW> g_originalCreateDsv;
+static_assert(sizeof(void*) == 8, "FH3ArcFix supports x64 only.");
+static_assert(std::atomic<void**>::is_always_lock_free,
+    "FH3ArcFix requires lock-free pointer atomics on x64.");
+
+// A record is written once and never removed. 'original' is deliberately not
+// atomic: publishing vtable with release semantics safely publishes the prior
+// original-function write. Readers first acquire-load vtable, and only read
+// original after observing the matching published vtable.
+struct HookRecord {
+    PFN_CREATE_DEPTH_STENCIL_VIEW original = nullptr;
+    std::atomic<void**> vtable{nullptr};
+};
+
+std::array<HookRecord, MAX_HOOK_RECORDS> g_hookRecords{};
 
 #ifdef FH3ARCFIX_DIAGNOSTICS
 void Trace(const char* text) {
@@ -40,6 +60,31 @@ void Trace(const char* text) {
 #else
 void Trace(const char*) {}
 #endif
+
+bool IsExecutableAddress(const void* address) {
+    if (!address) return false;
+
+    MEMORY_BASIC_INFORMATION mbi{};
+    if (VirtualQuery(address, &mbi, sizeof(mbi)) != sizeof(mbi)) {
+        return false;
+    }
+
+    if (mbi.State != MEM_COMMIT ||
+        (mbi.Protect & PAGE_GUARD) != 0 ||
+        (mbi.Protect & PAGE_NOACCESS) != 0) {
+        return false;
+    }
+
+    switch (mbi.Protect & 0xFFu) {
+        case PAGE_EXECUTE:
+        case PAGE_EXECUTE_READ:
+        case PAGE_EXECUTE_READWRITE:
+        case PAGE_EXECUTE_WRITECOPY:
+            return true;
+        default:
+            return false;
+    }
+}
 
 bool IsIntelArcAdapter(IUnknown* adapter) {
     if (!adapter) return false;
@@ -60,10 +105,20 @@ bool IsIntelArcAdapter(IUnknown* adapter) {
 
 PFN_CREATE_DEPTH_STENCIL_VIEW FindOriginalCreateDsv(ID3D12Device* self) {
     if (!self) return nullptr;
+
     void** vtable = *reinterpret_cast<void***>(self);
-    std::lock_guard<std::mutex> lock(g_hookMutex);
-    auto it = g_originalCreateDsv.find(vtable);
-    return it == g_originalCreateDsv.end() ? nullptr : it->second;
+    if (!vtable) return nullptr;
+
+    // Hot path: no mutex and no allocation. A successful acquire-load of the
+    // published vtable synchronizes with PatchDeviceVtable's release-store and
+    // makes the immutable 'original' pointer visible to this thread.
+    for (const auto& record : g_hookRecords) {
+        if (record.vtable.load(std::memory_order_acquire) == vtable) {
+            return record.original;
+        }
+    }
+
+    return nullptr;
 }
 
 void STDMETHODCALLTYPE HookCreateDepthStencilView(
@@ -76,6 +131,7 @@ void STDMETHODCALLTYPE HookCreateDepthStencilView(
     if (!original) {
         // Fail closed: if our bookkeeping is unavailable, do not fabricate a
         // call into an unknown function pointer.
+        Trace("[FH3ArcFix] missing hook record; CreateDSV not forwarded\r\n");
         return;
     }
 
@@ -108,27 +164,72 @@ bool PatchDeviceVtable(ID3D12Device* device) {
     void** vtable = *reinterpret_cast<void***>(device);
     if (!vtable) return false;
 
-    std::lock_guard<std::mutex> lock(g_hookMutex);
-    if (g_originalCreateDsv.find(vtable) != g_originalCreateDsv.end()) {
-        return true;
+    // Setup is rare and may use a mutex. Only CreateDepthStencilView's hot
+    // read path is lock-free.
+    std::lock_guard<std::mutex> lock(g_patchMutex);
+
+    // Already registered/patched.
+    for (const auto& record : g_hookRecords) {
+        if (record.vtable.load(std::memory_order_acquire) == vtable) {
+            return true;
+        }
     }
 
-    auto original = reinterpret_cast<PFN_CREATE_DEPTH_STENCIL_VIEW>(vtable[VT_CREATE_DEPTH_STENCIL_VIEW]);
-    if (!original) return false;
+    void* originalAddress = vtable[VT_CREATE_DEPTH_STENCIL_VIEW];
+    auto original = reinterpret_cast<PFN_CREATE_DEPTH_STENCIL_VIEW>(originalAddress);
 
-    DWORD oldProtect = 0;
-    if (!VirtualProtect(&vtable[VT_CREATE_DEPTH_STENCIL_VIEW], sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+    // Runtime sanity checks before modifying the shared runtime vtable.
+    if (!originalAddress || original == &HookCreateDepthStencilView ||
+        !IsExecutableAddress(originalAddress)) {
+        Trace("[FH3ArcFix] refused vtable patch: invalid CreateDSV slot\r\n");
         return false;
     }
 
-    g_originalCreateDsv.emplace(vtable, original);
+    HookRecord* emptyRecord = nullptr;
+    for (auto& record : g_hookRecords) {
+        if (record.vtable.load(std::memory_order_relaxed) == nullptr) {
+            emptyRecord = &record;
+            break;
+        }
+    }
+
+    // FH3 is expected to use a single D3D12 runtime vtable. The bounded table
+    // deliberately fails closed if an unexpected process creates more than 16
+    // distinct vtables; records are never recycled because patched vtables may
+    // remain reachable for the lifetime of the process.
+    if (!emptyRecord) {
+        Trace("[FH3ArcFix] hook record table full; vtable not patched\r\n");
+        return false;
+    }
+
+    DWORD oldProtect = 0;
+    if (!VirtualProtect(&vtable[VT_CREATE_DEPTH_STENCIL_VIEW], sizeof(void*),
+                        PAGE_EXECUTE_READWRITE, &oldProtect)) {
+        Trace("[FH3ArcFix] VirtualProtect failed; vtable not patched\r\n");
+        return false;
+    }
+
+    // Publish bookkeeping before exposing the hook through the runtime vtable.
+    // The release-store makes the preceding 'original' write visible to a hook
+    // thread that observes this vtable via an acquire-load.
+    emptyRecord->original = original;
+    emptyRecord->vtable.store(vtable, std::memory_order_release);
+
+    // InterlockedExchangePointer is the Windows-supported atomic pointer swap
+    // used to expose the hook after its record has been published.
     InterlockedExchangePointer(
         reinterpret_cast<PVOID volatile*>(&vtable[VT_CREATE_DEPTH_STENCIL_VIEW]),
         reinterpret_cast<PVOID>(&HookCreateDepthStencilView));
 
     DWORD ignored = 0;
-    VirtualProtect(&vtable[VT_CREATE_DEPTH_STENCIL_VIEW], sizeof(void*), oldProtect, &ignored);
-    FlushInstructionCache(GetCurrentProcess(), &vtable[VT_CREATE_DEPTH_STENCIL_VIEW], sizeof(void*));
+    if (!VirtualProtect(&vtable[VT_CREATE_DEPTH_STENCIL_VIEW], sizeof(void*),
+                        oldProtect, &ignored)) {
+        Trace("[FH3ArcFix] warning: failed to restore vtable page protection\r\n");
+    }
+
+    FlushInstructionCache(GetCurrentProcess(),
+                          &vtable[VT_CREATE_DEPTH_STENCIL_VIEW], sizeof(void*));
+    Trace("[FH3ArcFix] patched ID3D12Device::CreateDepthStencilView\r\n");
     return true;
 }
 

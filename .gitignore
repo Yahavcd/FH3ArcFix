@@ -1,8 +1,10 @@
 build/
 build-debug/
+release/
 *.obj
 *.exp
 *.lib
 *.pdb
 *.ilk
-FH3ArcFix-v1.0-win64.zip
+FH3ArcFix-v*-win64.zip
+FH3ArcFix-v*-SHA256SUMS.txt

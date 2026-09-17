@@ -5,13 +5,13 @@ A small compatibility fix for **Forza Horizon 3 (PC/UWP)** failing to start on m
 
 ## Status
 
-**v1.0.0 — working on the tested system.**
+**v1.0.1 — working on the tested system.**
 
 Tested with:
 
-* Forza Horizon 3 / `Microsoft.OpusPG` **1.0.125.2**
-* **Intel Arc Pro B50**
-* Windows 11 24H2 (26100-series)
+- Forza Horizon 3 / `Microsoft.OpusPG` **1.0.125.2**
+- **Intel Arc Pro B50**
+- Windows 11 24H2 (26100-series)
 
 The game previously crashed shortly after launch with `0xc0000005` at
 `forza_x64_release_final.exe + 0x1f28dec`. With FH3ArcFix installed, the game launches and
@@ -19,7 +19,7 @@ normal gameplay works on the tested machine.
 
 > **Known issues:**
 >
-> - FH3 may still show **FH204 — Unsupported graphics card detected**. Choose **Ignore and continue**. FH204 suppression is intentionally not part of v1.0.
+> - FH3 may still show **FH204 — Unsupported graphics card detected**. Choose **Ignore and continue**. FH204 suppression is intentionally not part of v1.0.x.
 > - **Disable Frame Smoothing in FH3.** On the tested Arc system, enabling it causes a severe performance drop.
 > - Minor pop-in or shadow/lighting flicker may occur. It is currently unclear whether this is Arc-specific or normal FH3 rendering behavior.
 
@@ -51,15 +51,17 @@ install directory.
 FH3ArcFix does **not** require global Vulkan/DXVK variables, D3D debug settings, driver changes,
 or registry changes.
 
-* Adding the Dll to the game folder should also work
+You can also manually place `d3d12.dll` in the Forza Horizon 3 game directory.
 
 ## Uninstall
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\uninstall.ps1
 ```
-* Removing the Dll from the game folder should also work
-  
+
+If you installed the DLL manually, removing the local `d3d12.dll` from the game directory also
+removes FH3ArcFix.
+
 ## Build from source
 
 The build scripts and source files are included in the GitHub source repository/source archive,
@@ -67,8 +69,8 @@ not in the binary release ZIP.
 
 Requirements:
 
-* Visual Studio Build Tools with **Desktop development with C++**
-* Windows SDK
+- Visual Studio Build Tools with **Desktop development with C++**
+- Windows SDK
 
 From an **x64 Native Tools Command Prompt**:
 
@@ -88,15 +90,15 @@ For diagnostic `OutputDebugString` messages usable with DebugView:
 build-debug.cmd
 ```
 
-## Safety / Scope
+## Safety / scope
 
-* The runtime patch is enabled only for an adapter with Intel vendor ID `0x8086` whose name
-contains `Arc`.
-* The installer refuses untested FH3 package versions by default. Use `-Force` only if you are
-deliberately testing another build.
-* The installer refuses to overwrite a different existing `d3d12.dll` unless `-Force` is used.
-* No game files are distributed by this project.
-* This project does not bypass Microsoft Store licensing or ownership checks.
+- The runtime patch is enabled only for an adapter with Intel vendor ID `0x8086` whose name
+  contains `Arc`.
+- The installer refuses untested FH3 package versions by default. Use `-Force` only if you are
+  deliberately testing another build.
+- The installer refuses to overwrite a different existing `d3d12.dll` unless `-Force` is used.
+- No game files are distributed by this project.
+- This project does not bypass Microsoft Store licensing or ownership checks.
 
 ## Compatibility
 
@@ -105,9 +107,9 @@ Please include Windows build, driver version, and FH3 package version.
 
 ## Development
 
-FH3ArcFix was developed using **ChatGPT (OpenAI)** through hands-on
-debugging on real hardware, including crash-dump analysis, D3D12 Debug Layer/DRED tracing, and
-iterative testing of the compatibility shim.
+FH3ArcFix was developed using **ChatGPT (OpenAI)** through hands-on debugging on real hardware,
+including crash-dump analysis, D3D12 Debug Layer/DRED tracing, and iterative testing of the
+compatibility shim.
 
 ## Disclaimer
 
@@ -117,4 +119,3 @@ Playground Games, Turn 10 Studios, Intel, or OpenAI.
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
