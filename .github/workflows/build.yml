@@ -8,11 +8,19 @@ on:
 jobs:
   windows-x64:
     runs-on: windows-latest
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
       - name: Build x64 DLL
         shell: cmd
-        run: ci-build.cmd
+        run: build.cmd
+
       - name: Upload DLL
         uses: actions/upload-artifact@v4
         with:
