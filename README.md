@@ -17,8 +17,9 @@ The game previously crashed shortly after launch with `0xc0000005` at
 `forza_x64_release_final.exe + 0x1f28dec`. With FH3ArcFix installed, the game launches and
 normal gameplay works on the tested machine.
 
-> **Known issue:** FH3 may still show **FH204 — Unsupported graphics card detected**.
-> Choose **Ignore and continue**. FH204 suppression is intentionally not part of v1.0.
+> **Known issuea:**
+> FH3 may still show **FH204 — Unsupported graphics card detected**. Choose **Ignore and continue**. FH204 suppression is intentionally not part of v1.0.
+> Disable Frame Smoothing in FH3. On the tested Arc system it causes a severe performance drop.
 
 ## What it fixes
 
