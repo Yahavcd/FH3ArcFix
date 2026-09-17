@@ -14,20 +14,20 @@ Tested with:
 * Windows 11 24H2 (26100-series)
 
 The game previously crashed shortly after launch with `0xc0000005` at
-`forza\\\_x64\\\_release\\\_final.exe + 0x1f28dec`. With FH3ArcFix installed, the game launches and
+`forza\_x64\_release\_final.exe + 0x1f28dec`. With FH3ArcFix installed, the game launches and
 normal gameplay works on the tested machine.
 
-> \\\*\\\*Known issue:\\\*\\\* FH3 may still show \\\*\\\*FH204 — Unsupported graphics card detected\\\*\\\*.
-> Choose \\\*\\\*Ignore and continue\\\*\\\*. FH204 suppression is intentionally not part of v1.0.
+> \*\*Known issue:\*\* FH3 may still show \*\*FH204 — Unsupported graphics card detected\*\*.
+> Choose \*\*Ignore and continue\*\*. FH204 suppression is intentionally not part of v1.0.
 
 ## What it fixes
 
-FH3 creates a **null D3D12 depth-stencil view** with `DXGI\\\_FORMAT\\\_UNKNOWN`. On the tested Arc
-system, the D3D12 runtime rejects this call, removes the device with `DXGI\\\_ERROR\\\_INVALID\\\_CALL`,
+FH3 creates a **null D3D12 depth-stencil view** with `DXGI\_FORMAT\_UNKNOWN`. On the tested Arc
+system, the D3D12 runtime rejects this call, removes the device with `DXGI\_ERROR\_INVALID\_CALL`,
 and FH3 enters its `Video card` fatal path.
 
 FH3ArcFix proxies the system `d3d12.dll` and intercepts only that exact invalid call. It changes
-the null DSV format from `DXGI\\\_FORMAT\\\_UNKNOWN` to `DXGI\\\_FORMAT\\\_D32\\\_FLOAT`. Every other D3D12
+the null DSV format from `DXGI\_FORMAT\_UNKNOWN` to `DXGI\_FORMAT\_D32\_FLOAT`. Every other D3D12
 call passes through unchanged.
 
 See [docs/TECHNICAL.md](docs/TECHNICAL.md) for the debugging details.
@@ -39,7 +39,7 @@ See [docs/TECHNICAL.md](docs/TECHNICAL.md) for the debugging details.
 3. Run:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\\install.ps1
+powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
 The installer finds the registered `Microsoft.OpusPG` package and places `d3d12.dll` in FH3's
@@ -51,7 +51,7 @@ or registry changes.
 ## Uninstall
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\\uninstall.ps1
+powershell -ExecutionPolicy Bypass -File .\uninstall.ps1
 ```
 
 ## Build from source
@@ -99,7 +99,7 @@ Please include Windows build, driver version, and FH3 package version.
 
 ## Development
 
-FH3ArcFix was developed collaboratively by **Yahavcd** and **ChatGPT (OpenAI)** through hands-on
+FH3ArcFix was developed using **ChatGPT (OpenAI)** through hands-on
 debugging on real hardware, including crash-dump analysis, D3D12 Debug Layer/DRED tracing, and
 iterative testing of the compatibility shim.
 
