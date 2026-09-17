@@ -82,7 +82,7 @@ For diagnostic `OutputDebugString` messages usable with DebugView:
 build-debug.cmd
 ```
 
-## Safety / scope
+## Safety / Scope
 
 * The runtime patch is enabled only for an adapter with Intel vendor ID `0x8086` whose name
 contains `Arc`.
