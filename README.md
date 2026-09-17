@@ -14,7 +14,7 @@ Tested with:
 * Windows 11 24H2 (26100-series)
 
 The game previously crashed shortly after launch with `0xc0000005` at
-`forza\\\\\\\_x64\\\\\\\_release\\\\\\\_final.exe + 0x1f28dec`. With FH3ArcFix installed, the game launches and
+`forza\\\_x64\\\_release\\\_final.exe + 0x1f28dec`. With FH3ArcFix installed, the game launches and
 normal gameplay works on the tested machine.
 
 > \\\*\\\*Known issue:\\\*\\\* FH3 may still show \\\*\\\*FH204 — Unsupported graphics card detected\\\*\\\*.
