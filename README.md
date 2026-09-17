@@ -50,14 +50,15 @@ install directory.
 FH3ArcFix does **not** require global Vulkan/DXVK variables, D3D debug settings, driver changes,
 or registry changes.
 
+* Adding the Dll to the game folder should also work
+
 ## Uninstall
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\uninstall.ps1
 ```
-
-* Copying/removing the `d3d12.dll` to the game folder should also work
-
+* Removing the Dll from the game folder should also work
+  
 ## Build from source
 
 The build scripts and source files are included in the GitHub source repository/source archive,
