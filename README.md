@@ -92,8 +92,10 @@ build-debug.cmd
 
 ## Safety / scope
 
-- The runtime patch is enabled only for an adapter with Intel vendor ID `0x8086` whose name
-  contains `Arc`.
+- The standard release build enables the runtime patch automatically only for an adapter with
+  Intel vendor ID `0x8086` whose name contains `Arc`.
+- The experimental all-GPUs build removes that adapter restriction but keeps the exact same
+  narrowly-scoped D3D12 workaround.
 - The installer refuses untested FH3 package versions by default. Use `-Force` only if you are
   deliberately testing another build.
 - The installer refuses to overwrite a different existing `d3d12.dll` unless `-Force` is used.
@@ -102,8 +104,41 @@ build-debug.cmd
 
 ## Compatibility
 
-Currently confirmed only on the system listed above. Reports from other Arc GPUs are welcome.
-Please include Windows build, driver version, and FH3 package version.
+The standard build is currently validated only on the Intel Arc Pro B50 test system.
+Reports from other Arc GPUs are welcome.
+
+For non-Arc hardware, use the experimental all-GPUs build described below.
+
+Please include Windows build, driver version, FH3 package version, and exact GPU model when
+reporting results.
+
+### Experimental support for non-Arc GPUs
+
+An **experimental all-GPUs build** is available for testing on D3D12 hardware that is not covered
+by the standard Intel Arc auto-detection.
+
+This experimental variant removes the Intel Arc adapter check, but keeps the exact same
+narrowly-scoped workaround:
+
+- only the confirmed null `CreateDepthStencilView` call is intercepted;
+- `DXGI_FORMAT_UNKNOWN` is changed to `DXGI_FORMAT_D32_FLOAT`;
+- all other D3D12 calls are forwarded unchanged.
+
+> **Warning:** The experimental build has not been validated on non-Arc GPUs.
+> It is intended for testing and game-preservation work on older Intel GPUs,
+> AMD/NVIDIA hardware, and less common GPUs such as Moore Threads and other
+> alternative D3D12 implementations.
+
+If you test the experimental build, please report:
+
+- exact GPU model
+- driver version
+- Windows build
+- FH3 package version
+- whether the game launches successfully
+- any crashes, visual artifacts, or performance issues
+
+See [EXPERIMENTAL_README.md](EXPERIMENTAL_README.md) for details.
 
 ## Development
 

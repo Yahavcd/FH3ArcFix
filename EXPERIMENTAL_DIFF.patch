@@ -1,0 +1,19 @@
+--- src/fh3arcfix.cpp (stable v1.0.1)
++++ src/fh3arcfix-experimental-all-gpus.cpp
+@@ -262,10 +262,14 @@
+     LoadRealD3D12();
+     if (!g_realCreateDevice) return E_NOINTERFACE;
+ 
+-    const bool targetArc = IsIntelArcAdapter(adapter);
++    // EXPERIMENTAL ALL-GPUS BUILD:
++    // Unlike the stable release, this variant intentionally does not gate the
++    // hook on Intel vendor ID / "Arc" adapter naming. It patches every D3D12
++    // device created by FH3, while keeping the exact same narrow null-DSV
++    // match before changing DXGI_FORMAT_UNKNOWN to DXGI_FORMAT_D32_FLOAT.
+     const HRESULT hr = g_realCreateDevice(adapter, minimumFeatureLevel, riid, ppDevice);
+ 
+-    if (targetArc && SUCCEEDED(hr) && ppDevice && *ppDevice) {
++    if (SUCCEEDED(hr) && ppDevice && *ppDevice) {
+         ID3D12Device* baseDevice = nullptr;
+         IUnknown* returned = reinterpret_cast<IUnknown*>(*ppDevice);
+         if (SUCCEEDED(returned->QueryInterface(__uuidof(ID3D12Device), reinterpret_cast<void**>(&baseDevice))) && baseDevice) {
