@@ -21,6 +21,7 @@ normal gameplay works on the tested machine.
 >
 > - FH3 may still show **FH204 — Unsupported graphics card detected**. Choose **Ignore and continue**. FH204 suppression is intentionally not part of v1.0.
 > - **Disable Frame Smoothing in FH3.** On the tested Arc system, enabling it causes a severe performance drop.
+> - Minor pop-in or shadow/lighting flicker may occur. It is currently unclear whether this is Arc-specific or normal FH3 rendering behavior.
 
 ## What it fixes
 
