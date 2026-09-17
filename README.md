@@ -55,6 +55,8 @@ or registry changes.
 powershell -ExecutionPolicy Bypass -File .\uninstall.ps1
 ```
 
+* Copying/removing the `d3d12.dll` to the game folder should also work
+
 ## Build from source
 
 The build scripts and source files are included in the GitHub source repository/source archive,
