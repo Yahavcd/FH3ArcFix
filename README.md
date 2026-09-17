@@ -73,7 +73,7 @@ build.cmd
 Output:
 
 ```text
-build\\d3d12.dll
+build\d3d12.dll
 ```
 
 For diagnostic `OutputDebugString` messages usable with DebugView:
