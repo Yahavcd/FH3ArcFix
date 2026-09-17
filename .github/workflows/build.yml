@@ -1,0 +1,20 @@
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows-x64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build x64 DLL
+        shell: cmd
+        run: ci-build.cmd
+      - name: Upload DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: FH3ArcFix-win64
+          path: build/d3d12.dll

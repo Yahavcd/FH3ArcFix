@@ -1,0 +1,4 @@
+LIBRARY d3d12
+EXPORTS
+    D3D12CreateDevice=FH3ArcFix_D3D12CreateDevice @101
+    D3D12SerializeRootSignature=FH3ArcFix_D3D12SerializeRootSignature @115

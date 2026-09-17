@@ -1,0 +1,8 @@
+build/
+build-debug/
+*.obj
+*.exp
+*.lib
+*.pdb
+*.ilk
+FH3ArcFix-v1.0-win64.zip
