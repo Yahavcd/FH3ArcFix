@@ -56,7 +56,8 @@ powershell -ExecutionPolicy Bypass -File .\\\\uninstall.ps1
 
 ## Build from source
 
-The build scripts and source files are included in the GitHub source repository/source archive, not in the binary release ZIP.
+The build scripts and source files are included in the GitHub source repository/source archive,
+not in the binary release ZIP.
 
 Requirements:
 
@@ -96,14 +97,10 @@ deliberately testing another build.
 Currently confirmed only on the system listed above. Reports from other Arc GPUs are welcome.
 Please include Windows build, driver version, and FH3 package version.
 
-## Development
-
-FH3ArcFix was developed with the help of **ChatGPT (OpenAI)** through hands-on debugging on real hardware, including crash-dump analysis, D3D12 Debug Layer/DRED tracing, and iterative testing of the compatibility shim.
-
 ## Disclaimer
 
 Unofficial community compatibility project. Not affiliated with or endorsed by Microsoft,
-Playground Games, Turn 10 Studios, Intel, or OpenAI.
+Playground Games, Turn 10 Studios, or Intel.
 
 ## License
 
