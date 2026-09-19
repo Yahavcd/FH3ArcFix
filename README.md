@@ -5,13 +5,15 @@ A small compatibility fix for **Forza Horizon 3 (PC/UWP)** failing to start on m
 
 ## Status
 
-**v1.0.1 — working on the tested system.**
+**v1.0.1 — confirmed working on multiple Intel Arc GPUs.**
 
-Tested with:
+Primary test system:
 
 - Forza Horizon 3 / `Microsoft.OpusPG` **1.0.125.2**
 - **Intel Arc Pro B50**
 - Windows 11 24H2 (26100-series)
+
+Also community-confirmed working on an **Intel Arc B580** with Windows 11 Pro 25H2.
 
 The game previously crashed shortly after launch with `0xc0000005` at
 `forza_x64_release_final.exe + 0x1f28dec`. With FH3ArcFix installed, the game launches and
