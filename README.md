@@ -104,7 +104,11 @@ build-debug.cmd
 
 ## Compatibility
 
-The standard build is currently validated only on the Intel Arc Pro B50 test system.
+Confirmed working on:
+
+- **Intel Arc Pro B50** — Windows 11 24H2, FH3 / `Microsoft.OpusPG` 1.0.125.2
+- **Intel Arc B580** — Windows 11 Pro 25H2 (community-confirmed)
+
 Reports from other Arc GPUs are welcome.
 
 For non-Arc hardware, use the experimental all-GPUs build described below.
