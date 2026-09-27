@@ -151,7 +151,7 @@ See [EXPERIMENTAL_README.md](EXPERIMENTAL_README.md) for details.
 ## Development
 
 FH3ArcFix was developed using **ChatGPT (OpenAI)** through hands-on debugging on real hardware,
-including crash-dump analysis, D3D12 Debug Layer/DRED tracing, and iterative testing of the
+including crash-dump analysis, WinDbg/D3D12 Debug Layer diagnostics, and iterative testing of the
 compatibility shim.
 
 I wrote up the full investigation and how I worked with ChatGPT here:
