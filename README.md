@@ -152,6 +152,9 @@ FH3ArcFix was developed using **ChatGPT (OpenAI)** through hands-on debugging on
 including crash-dump analysis, D3D12 Debug Layer/DRED tracing, and iterative testing of the
 compatibility shim.
 
+I wrote up the full investigation and how I worked with ChatGPT here:
+[How I found the fix](docs/DEBUGGING_JOURNEY.md).
+
 ## Disclaimer
 
 Unofficial community compatibility project. Not affiliated with or endorsed by Microsoft,
