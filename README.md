@@ -35,7 +35,8 @@ FH3ArcFix proxies the system `d3d12.dll` and intercepts only that exact invalid 
 the null DSV format from `DXGI_FORMAT_UNKNOWN` to `DXGI_FORMAT_D32_FLOAT`. Every other D3D12
 call passes through unchanged.
 
-See [docs/TECHNICAL.md](docs/TECHNICAL.md) for the debugging details.
+See [docs/TECHNICAL.md](docs/TECHNICAL.md) for the implementation details, or
+[docs/DEBUGGING_JOURNEY.md](docs/DEBUGGING_JOURNEY.md) for the full investigation.
 
 ## Install (binary release)
 
