@@ -23,6 +23,7 @@ Copy-Item (Join-Path $root 'README.md') $staging
 Copy-Item (Join-Path $root 'CHANGELOG.md') $staging
 Copy-Item (Join-Path $root 'LICENSE') $staging
 Copy-Item (Join-Path $root 'docs\TECHNICAL.md') (Join-Path $staging 'docs\TECHNICAL.md')
+Copy-Item (Join-Path $root 'docs\DEBUGGING_JOURNEY.md') (Join-Path $staging 'docs\DEBUGGING_JOURNEY.md')
 
 Compress-Archive -Path (Join-Path $staging '*') -DestinationPath $out -Force
 Remove-Item $staging -Recurse -Force
