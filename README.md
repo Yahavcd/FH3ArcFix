@@ -13,7 +13,7 @@ Primary test system:
 - **Intel Arc Pro B50**
 - Windows 11 24H2 (26100-series)
 
-Also community-confirmed working on an **Intel Arc B580** with Windows 11 Pro 25H2.
+Also community-confirmed working on an **Intel Arc B580** and **Intel Arc 130T**.
 
 The game previously crashed shortly after launch with `0xc0000005` at
 `forza_x64_release_final.exe + 0x1f28dec`. With FH3ArcFix installed, the game launches and
@@ -111,6 +111,7 @@ Confirmed working on:
 
 - **Intel Arc Pro B50** — Windows 11 24H2, FH3 / `Microsoft.OpusPG` 1.0.125.2
 - **Intel Arc B580** — Windows 11 Pro 25H2 (community-confirmed)
+- **Intel Arc 130T** — Windows 11 25H2 (community-confirmed)
 
 Reports from other Arc GPUs are welcome.
 
